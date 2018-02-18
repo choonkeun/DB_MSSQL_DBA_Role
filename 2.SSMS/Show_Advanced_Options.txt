@@ -1,0 +1,28 @@
+
+--> SOLUTION: https://sqlwithmanoj.com/tag/ad-hoc-distributed-queries/
+
+EXEC sp_configure 'show advanced options', 1
+RECONFIGURE
+GO
+EXEC sp_configure 'ad hoc distributed queries', 1
+RECONFIGURE
+GO
+--
+Configuration option 'show advanced options' changed from 1 to 1. Run the RECONFIGURE statement to install.
+Configuration option 'Ad Hoc Distributed Queries' changed from 0 to 1. Run the RECONFIGURE statement to install.
+
+
+===
+Run below Query to check if this property is disabled, if will show you 0 value under Config & Run value columns:
+    sp_configure 'show advanced options', 1
+    GO
+    EXEC sp_configure
+    GO
+---
+To enable it run the below Query:
+    sp_configure 'Ad Hoc Distributed Queries', 1
+    GO
+    RECONFIGURE WITH OverRide
+    GO
+    EXEC sp_configure
+    GO

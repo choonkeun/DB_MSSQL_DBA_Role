@@ -1,0 +1,72 @@
+
+https://youtu.be/gtyZmDBg5D4
+
+
+C:\Users\Admin> sqlcmd -H HOST -S . -d calsysbo -Q "BACKUP DATABASE calsysbo TO DISK='R:\calsysbo.bak'"
+Processed 346792 pages for database 'calsysbo', file 'calsysbo' on file 1.
+Processed 4 pages for database 'calsysbo', file 'calsysbo_log' on file 1.
+BACKUP DATABASE successfully processed 346796 pages in 16.691 seconds (162.323 MB/sec).
+C:\Users\Admin>
+
+---
+sqlcmd -U myLogin -P myPassword -S MyServerName -d MyDatabaseName -Q "DROP TABLE MyTable"
+sqlcmd -S <server Name> -U sa -P sapassword -i inputquery_file_name -o outputfile_name
+sqlcmd -S Serverinstance -E -i import_file.sql
+---
+
+Microsoft Windows [Version 10.0.10586]
+(c) 2015 Microsoft Corporation. All rights reserved.
+
+C:\Users\Admin>sqlcmd -L
+
+Servers:
+    (local)
+    HOST
+
+C:\Users\Admin>
+
+
+========
+BACKUP
+========
+echo off
+cls
+echo -- BACKUP DATABASE --
+set /p DATABASENAME=Enter database name:
+
+:: filename format Name-Date (eg MyDatabase-2009.5.19.bak)
+set DATESTAMP=%DATE:~-4%.%DATE:~7,2%.%DATE:~4,2%
+set BACKUPFILENAME=%CD%\%DATABASENAME%-%DATESTAMP%.bak
+set SERVERNAME=your server name here
+echo.
+
+sqlcmd -E -S %SERVERNAME% -d master -Q "BACKUP DATABASE [%DATABASENAME%] TO DISK = N'%BACKUPFILENAME%' WITH INIT , NOUNLOAD , NAME = N'%DATABASENAME% backup', NOSKIP , STATS = 10, NOFORMAT"
+echo.
+pause
+
+
+========
+RESTORE
+========
+echo off
+cls
+echo -- RESTORE DATABASE --
+set /p BACKUPFILENAME=Enter backup file name:%CD%\
+set /p DATABASENAME=Enter database name:
+set SERVERNAME=your server name here
+sqlcmd -E -S %SERVERNAME% -d master -Q "ALTER DATABASE [%DATABASENAME%] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"
+
+:: WARNING - delete the database, suits me
+:: sqlcmd -E -S %SERVERNAME% -d master -Q "IF EXISTS (SELECT * FROM sysdatabases WHERE name=N'%DATABASENAME%' ) DROP DATABASE [%DATABASENAME%]"
+:: sqlcmd -E -S %SERVERNAME% -d master -Q "CREATE DATABASE [%DATABASENAME%]"
+
+:: restore
+sqlcmd -E -S %SERVERNAME% -d master -Q "RESTORE DATABASE [%DATABASENAME%] FROM DISK = N'%CD%\%BACKUPFILENAME%' WITH REPLACE"
+
+:: remap user/login (http://msdn.microsoft.com/en-us/library/ms174378.aspx)
+sqlcmd -E -S %SERVERNAME% -d %DATABASENAME% -Q "sp_change_users_login 'Update_One', 'login-name', 'user-name'"
+sqlcmd -E -S %SERVERNAME% -d master -Q "ALTER DATABASE [%DATABASENAME%] SET MULTI_USER"
+echo.
+pause
+
+

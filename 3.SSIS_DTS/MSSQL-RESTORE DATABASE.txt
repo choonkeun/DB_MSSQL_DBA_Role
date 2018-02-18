@@ -1,0 +1,30 @@
+
+1.1 Check BAK File
+
+  USE master;
+  GO
+  RESTORE FILELISTONLY FROM DISK = 'D:\unzip\myDemo.bak'
+  LogicalName        PhysicalName                                                                           Type FileGroupName    Size     MaxSize             
+  --------------------------------------------------------------------------------------------------------- ---- ---------------- -------- --------------------
+  myDemo             C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\myDemo.mdf        D    PRIMARY          5242880  35184372080640      
+  myDemo_log         C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\myDemo_log.ldf    L    NULL             1048576  2199023255552       
+  
+  (2 row(s) affected)
+
+1.2 Check Restore BAK File status
+
+  USE master;
+  GO
+  RESTORE FILELISTONLY FROM DISK = 'D:\unzip\myDemo.bak'
+
+2. Restore BAK File : Change Target File Path
+
+  USE master;
+  GO
+  RESTORE DATABASE myDemo FROM  DISK = 'D:\unzip\myDemo.bak'
+  WITH MOVE 'myDemo'     TO 'C:\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\calsysbo.mdf',
+       MOVE 'myDemo_log' TO 'C:\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\calsysbo_log.ldf',
+  REPLACE
+  GO
+  
+

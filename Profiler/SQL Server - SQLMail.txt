@@ -1,0 +1,50 @@
+Configuring Database Mail Using T-SQL Script
+ Collapse | Copy Code
+--Enabling Database Mail
+sp_configure 'show advanced options',1
+reconfigure
+
+ Collapse | Copy Code
+--Creating a Profile
+EXECUTE msdb.dbo.sysmail_add_profile_sp
+@profile_name = 'SQLProfile',
+@description = 'Mail Service for SQL Server' ;
+
+ Collapse | Copy Code
+-- Create a Mail account for gmail. We have to use our company mail account.
+EXECUTE msdb.dbo.sysmail_add_account_sp
+@account_name = 'SQL_Email_Account',
+@email_address = 'youremail@gmail.com',
+@mailserver_name = 'smtp.gmail.com',
+@port=587,
+@enable_ssl=1,
+@username='youremail',
+@password='Emailid password'
+
+ Collapse | Copy Code
+-- Adding the account to the profile
+EXECUTE msdb.dbo.sysmail_add_profileaccount_sp
+@profile_name = 'SQLProfile',
+@account_name = 'SQL_Email_Account',
+@sequence_number =1 ;
+
+ Collapse | Copy Code
+-- Granting access to the profile to the DatabaseMailUserRole of MSDB
+EXECUTE msdb.dbo.sysmail_add_principalprofile_sp
+@profile_name = 'SQLProfile',
+@principal_id = 0,
+@is_default = 1 ;
+
+ Collapse | Copy Code
+--Sending Test Mail
+EXEC msdb.dbo.sp_send_dbmail
+@profile_name = 'SQLProfile',
+@recipients = 'youremailid@xxxx.com',
+@body = 'Database Mail Testing...',
+@subject = 'Databas Mail from SQL Server';
+
+ Collapse | Copy Code
+--Verifying, check status column
+select * from sysmail_allitems 
+
+Summary   

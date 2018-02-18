@@ -1,0 +1,14 @@
+
+https://docs.microsoft.com/en-us/sql/t-sql/functions/openquery-transact-sql
+
+
+OPENQUERY ( linked_server ,'query' )  
+
+
+UPDATE OPENQUERY (OracleSvr, 'SELECT name FROM joe.titles WHERE id = 101')   
+SET name = 'ADifferentName';  
+
+DELETE OPENQUERY (OracleSvr, 'SELECT name FROM joe.titles WHERE name = ''NewTitle''');  
+
+SELECT * FROM OPENQUERY (OracleSvr, 'SELECT name FROM joe.titles WHERE name = ''NewTitle''');  
+

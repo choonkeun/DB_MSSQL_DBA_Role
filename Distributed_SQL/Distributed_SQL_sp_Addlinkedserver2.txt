@@ -1,0 +1,52 @@
+
+=========================================================================
+'DEV' should be registered into C:\Windows\System32\Drivers\etc\host file
+=========================================================================
+
+SET NOCOUNT ON
+GO
+EXEC sp_addlinkedserver 
+    @server = 'DEV',
+    @srvproduct = 'SQLServer OLEDB Provider',
+    @provider = 'SQLOLEDB',
+    @datasrc = 'DEV'
+GO
+EXEC sp_addlinkedsrvlogin
+    @rmtsrvname = DEV, 
+    @useself = 'FALSE',
+    @rmtuser = 'myLogin',
+    @rmtpassword = 'myPassword'
+GO
+EXEC sp_serveroption 'DEV', 'rpc', TRUE
+GO
+EXEC sp_serveroption 'DEV', 'rpc out', TRUE
+GO
+-------------------------------------------------------------------------
+select top 10 * from DEV.OEVS.dbo.UsrReports
+    --> *** NO XML FIELD SUPPORT ***
+    Msg 9514, Level 16, State 1, Line 1
+    Xml data type is not supported in distributed queries. Remote object 'DEV.OEVS.dbo.UsrReports' has xml column(s).
+-------------------------------------------------------------------------
+SELECT TOP 10 * from DEV.MRO.dbo.LabData
+SELECT TOP 10 * FROM OPENQUERY( DEV, 'select top 10 * from MRO.dbo.LabData')
+
+LabDataId   CCFId       transType labId       labAccID        labCode      AcctNum AccountName                    RegLocCode LocPhone   CertFlag DonorPhone DonorFname                DonorLname                DonorSSN   ReasonTest SplitSpecRec CollectTemp CollectDateTime         LabRecDateTime          LabReportDateTime       CollectorPhone CollectorName                  OverallResult DOTreg multiUse               ColSiteName          ColAddress1                    ColAddress2                    ColAddress3                    ColCity              ColState ColZip     UnregComments                  CCFNum          priorAcct DOTresult CertSciName                    POCTproduct TempInRange 
+----------- ----------- --------- ----------- --------------- ------------ ------- ------------------------------ ---------- ---------- -------- ---------- ------------------------- ------------------------- ---------- ---------- ------------ ----------- ----------------------- ----------------------- ----------------------- -------------- ------------------------------ ------------- ------ ---------------------- -------------------- ------------------------------ ------------------------------ ------------------------------ -------------------- -------- ---------- ------------------------------ --------------- --------- --------- ------------------------------ ----------- ----------- 
+99031       0           01        2           211824540       LS01         CO1102  PSYCHEMEDICS CORPORATION - INT TES717     NULL       NULL     NULL       (Not Provided)            (Not Provided)            222334444  AN         NULL         NULL        2017-08-05 13:00:00.000 2017-08-07 08:49:29.000 2017-08-10 08:20:22.000 NULL           NULL                           P             0      NULL                   NULL                 NULL                           NULL                           NULL                           NULL                 NULL     NULL       NULL                           X961524         NULL      NULL      Ping Guan BS                   NULL        NULL        
+99032       0           01        2           211824540       LS01         CO1102  PSYCHEMEDICS CORPORATION - INT TES717     NULL       NULL     NULL       (Not Provided)            (Not Provided)            222334444  AN         NULL         NULL        2017-08-05 13:00:00.000 2017-08-07 08:49:29.000 2017-08-10 08:20:22.000 NULL           NULL                           P             0      NULL                   NULL                 NULL                           NULL                           NULL                           NULL                 NULL     NULL       NULL                           DFccf123        NULL      NULL      Ping Guan BS                   NULL        NULL        
+99033       0           01        2           211824540       LS01         CO1102  PSYCHEMEDICS CORPORATION - INT TES717     NULL       NULL     NULL       (Not Provided)            (Not Provided)            222334444  AN         NULL         NULL        2017-08-05 13:00:00.000 2017-08-07 08:49:29.000 2017-08-10 08:20:22.000 NULL           NULL                           P             0      NULL                   NULL                 NULL                           NULL                           NULL                           NULL                 NULL     NULL       NULL                           DFccf123        NULL      NULL      Ping Guan BS                   NULL        NULL        
+99034       0           01        2           212267767       LS01         CO1171  SWIFT TRANSPORTATION           SWF008     NULL       NULL     NULL       Stephen                   Bair                      111223333  PE         NULL         NULL        2017-12-01 11:01:00.000 2017-12-06 09:42:14.000 2017-12-08 20:05:20.000 NULL           NULL                           P             0      NULL                   NULL                 NULL                           NULL                           NULL                           NULL                 NULL     NULL       NULL                           Y412964         NULL      NULL      Christina Lee BS               NULL        NULL        
+99035       0           01        2           211824540       LS01         CO1102  PSYCHEMEDICS CORPORATION - INT TES717     NULL       NULL     NULL       (Not Provided)            (Not Provided)            222334444  AN         NULL         NULL        2017-08-05 13:00:00.000 2017-08-07 08:49:29.000 2017-08-10 08:20:22.000 NULL           NULL                           P             0      NULL                   NULL                 NULL                           NULL                           NULL                           NULL                 NULL     NULL       NULL                           X961524         NULL      NULL      Ping Guan BS                   NULL        NULL        
+99036       0           01        2           212267767       LS01         CO1171  SWIFT TRANSPORTATION           SWF008     NULL       NULL     NULL       Stephen                   Bair                      111223333  PE         NULL         NULL        2017-12-01 11:01:00.000 2017-12-06 09:42:14.000 2017-12-08 20:05:20.000 NULL           NULL                           P             0      NULL                   NULL                 NULL                           NULL                           NULL                           NULL                 NULL     NULL       NULL                           Y412964         NULL      NULL      Christina Lee BS               NULL        NULL        
+99037       0           01        2           212267767       LS01         CO1171  SWIFT TRANSPORTATION           SWF008     NULL       NULL     NULL       Stephen                   Bair                      111223333  PE         NULL         NULL        2017-12-01 11:01:00.000 2017-12-06 09:42:14.000 2017-12-08 20:05:20.000 NULL           NULL                           P             0      NULL                   NULL                 NULL                           NULL                           NULL                           NULL                 NULL     NULL       NULL                           Y412964         NULL      NULL      Christina Lee BS               NULL        NULL        
+99038       0           01        2           212267767       LS01         CO1171  SWIFT TRANSPORTATION           SWF008     NULL       NULL     NULL       Stephen                   Bair                      111223333  PE         NULL         NULL        2017-12-01 11:01:00.000 2017-12-06 09:42:14.000 2017-12-08 20:05:20.000 NULL           NULL                           P             0      NULL                   NULL                 NULL                           NULL                           NULL                           NULL                 NULL     NULL       NULL                           Y412964         NULL      NULL      Christina Lee BS               NULL        NULL        
+99039       0           01        2           212267767       LS01         CO1171  SWIFT TRANSPORTATION           SWF008     NULL       NULL     NULL       Stephen                   Bair                      111223333  PE         NULL         NULL        2017-12-01 11:01:00.000 2017-12-06 09:42:14.000 2017-12-08 20:05:20.000 NULL           NULL                           P             0      NULL                   NULL                 NULL                           NULL                           NULL                           NULL                 NULL     NULL       NULL                           Y412964         NULL      NULL      Christina Lee BS               NULL        NULL        
+99040       0           01        2           212267767       LS01         CO1171  SWIFT TRANSPORTATION           SWF008     NULL       NULL     NULL       Stephen                   Bair                      111223333  PE         NULL         NULL        2017-12-01 11:01:00.000 2017-12-06 09:42:14.000 2017-12-08 20:05:20.000 NULL           NULL                           P             0      NULL                   NULL                 NULL                           NULL                           NULL                           NULL                 NULL     NULL       NULL                           Y412964         NULL      NULL      Christina Lee BS               NULL        NULL        
+---
+==============================================================
+EXEC sp_dropserver @server = 'DEV', @droplogins = 'droplogins'
+GO
+Command(s) completed successfully.
+---
+EXEC sp_dropserver 'repl_distributor', droplogins
+

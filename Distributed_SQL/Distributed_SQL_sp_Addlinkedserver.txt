@@ -1,0 +1,141 @@
+
+sp_addlinkedserver (Transact-SQL)
+
+sp_addlinkedserver 
+     [ @server= ] 'server' 
+     [ , [ @srvproduct= ] 'product_name' ]   
+     [ , [ @provider= ] 'provider_name' ]  
+     [ , [ @datasrc= ] 'data_source' ]   
+     [ , [ @location= ] 'location' ]   
+     [ , [ @provstr= ] 'provider_string' ]   
+     [ , [ @catalog= ] 'catalog' ]
+     
+    EXEC sp_addlinkedserver     
+       @server=N'192.168.6.210',   
+       @provider=N'SQLNCLI',   
+       @datasrc=N'S1\instance1';
+---
+EXEC sp_addlinkedserver @server='192.168.6.210'
+EXEC sp_addlinkedsrvlogin '192.168.6.210', 'false', NULL, 'myLogin', 'myPassword'  
+Command(s) completed successfully. 
+
+SELECT * FROM sys.servers
+
+server_id   name             product     provider    data_source      location    provider_string    catalog   connect_timeout query_timeout is_linked is_remote_login_enabled is_rpc_out_enabled is_data_access_enabled is_collation_compatible uses_remote_collation collation_name  lazy_schema_validation is_system is_publisher is_subscriber is_distributor is_nonsql_subscriber is_remote_proc_transaction_promotion_enabled modify_date
+----------- ---------------- ----------- ----------- ---------------- ----------- ------------------ --------- --------------- ------------- --------- ----------------------- ------------------ ---------------------- ----------------------- --------------------- --------------- ---------------------- --------- ------------ ------------- -------------- -------------------- -------------------------------------------- -----------------------
+0           WIN2012          SQL Server  SQLNCLI     WIN2012          NULL        NULL               NULL      0               0             0         1                       1                  0                      0                       1                     NULL            0                      0         0            0             0              0                    1                                            2017-04-26 11:13:44.020
+1           192.168.6.210    SQL Server  SQLNCLI     192.168.6.210    NULL        NULL               NULL      0               0             1         1                       1                  1                      0                       1                     NULL            0                      0         0            0             0              0                    1                                            2017-12-19 15:56:52.920
+
+(2 row(s) affected)
+
+
+---
+sp_droplinkedsrvlogin [ @rmtsrvname= ] 'rmtsrvname', [ @locallogin= ] 'locallogin'  
+A. Removing the login mapping for an existing user: EXEC sp_droplinkedsrvlogin 'Accounts', 'Mary';     
+B. Removing the default login mapping             : EXEC sp_droplinkedsrvlogin 'Accounts', NULL;  
+
+EXEC sp_dropserver 'ADMIN\MSSQLSERVER2012' -- <Old Name\Instance>
+GO
+
+EXEC sp_addserver 'PARESH\MSSQLSERVER2012','local' -- <New Name\Instance>
+GO
+
+EXEC sp_droplinkedsrvlogin N'192.168.6.210', 'myLogin';
+Command(s) completed successfully.
+---
+
+---
+
+SELECT a.*
+INTO NorthWind.dbo.UsrReports
+FROM OPENDATASOURCE(
+    'SQLNCLI', 
+    'Server=192.168.6.210;192.168.6.210;Initial Catalog=OEVS;Persist Security Info=True;User ID=myLogin;Password=myPassword', 
+    'SELECT * FROM oevs.dbo.UsrReports; '
+) AS a;            
+     
+---A. Using the Microsoft SQL Server Native Client OLE DB Provider
+    EXEC sp_addlinkedserver     
+       @server=N'S1_instance1',   
+       @srvproduct=N'',  
+       @provider=N'SQLNCLI',   
+       @datasrc=N'S1\instance1';
+       
+---B. Using the Microsoft OLE DB Provider for Microsoft Access
+    EXEC sp_addlinkedserver   
+       @server = N'SEATTLE Mktg',   
+       @provider = N'Microsoft.Jet.OLEDB.4.0',   
+       @srvproduct = N'OLE DB Provider for Jet',  
+       @datasrc = N'C:\MSOffice\Access\Samples\Northwind.mdb';  
+    GO
+
+---C. Using the Microsoft OLE DB Provider for ODBC with the data_source parameter
+    EXEC sp_addlinkedserver   
+       @server = N'SEATTLE Payroll',   
+       @srvproduct = N'',  
+       @provider = N'MSDASQL',   
+       @datasrc = N'LocalServer';  
+    GO 
+
+---D. Using the Microsoft OLE DB Provider for Excel spreadsheet
+    EXEC sp_addlinkedserver 'ExcelSource',  
+       'Jet 4.0',  
+       'Microsoft.Jet.OLEDB.4.0',  
+       'c:\MyData\DistExcl.xls',  
+       NULL,  
+       'Excel 5.0';  
+    GO
+    To connect to an Excel spreadsheet in the Excel 2007 format use the ACE provider.
+    EXEC sp_addlinkedserver @server = N'ExcelDataSource',   
+    @srvproduct=N'ExcelData', @provider=N'Microsoft.ACE.OLEDB.12.0',   
+    @datasrc=N'C:\DataFolder\People.xlsx',  
+    @provstr=N'EXCEL 12.0' ;
+
+---E. Using the Microsoft OLE DB Provider for Jet to access a text file
+    --Create a linked server.  
+    EXEC sp_addlinkedserver txtsrv, N'Jet 4.0',   
+       N'Microsoft.Jet.OLEDB.4.0',  
+       N'c:\data\distqry',  
+       NULL,  
+       N'Text';  
+    GO  
+
+    --Set up login mappings.  
+    EXEC sp_addlinkedsrvlogin txtsrv, FALSE, Admin, NULL;  
+    GO  
+
+    --List the tables in the linked server.  
+    EXEC sp_tables_ex txtsrv;  
+    GO  
+
+    --Query one of the tables: file1#txt  
+    --using a four-part name.   
+    SELECT *   
+    FROM txtsrv...[file1#txt];
+
+---G. Add a Azure SQL Database as a Linked Server For Use With Distributed Queries on Cloud and On-Premise Databases
+    ------ Configure the linked server  
+    -- Add one Windows Azure SQL DB as Linked Server  
+    EXEC sp_addlinkedserver  
+    @server='myLinkedServer', -- here you can specify the name of the linked server  
+    @srvproduct='',       
+    @provider='sqlncli', -- using SQL Server Native Client  
+    @datasrc='myServer.database.windows.net',   -- add here your server name  
+    @location='',  
+    @provstr='',  
+    @catalog='myDatabase'  -- add here your database name as initial catalog (you cannot connect to the master database)  
+    -- Add credentials and options to this linked server  
+    EXEC sp_addlinkedsrvlogin  
+    @rmtsrvname = 'myLinkedServer',  
+    @useself = 'false',  
+    @rmtuser = ''myLogin'',             -- add here your login on Azure DB  
+    @rmtpassword = 'myPassword' -- add here your password on Azure DB  
+    EXEC sp_serveroption 'myLinkedServer', 'rpc out', true;  
+    ------ Now you can use the linked server to execute 4-part queries  
+    -- You can create a new table in the Azure DB  
+    exec ('CREATE TABLE t1tutut2(col1 int not null CONSTRAINT PK_col1 PRIMARY KEY CLUSTERED (col1) )') at myLinkedServer  
+    -- Insert data from your local SQL Server  
+    exec ('INSERT INTO t1tutut2 VALUES(1),(2),(3)') at myLinkedServer  
+
+    -- Query the data using 4-part names  
+    select * from myLinkedServer.myDatabase.dbo.myTable

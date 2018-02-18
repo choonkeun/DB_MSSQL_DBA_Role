@@ -1,0 +1,117 @@
+
+====================================================================================================
+IF NOT EXISTS ( SELECT name  FROM master.sys.server_principals WHERE name =[myUser] )
+    BEGIN
+		--Create: Security > Logins > [myUser]--> Login Account
+		--Login만 가능하다. Database에 접근을 하려면 Database User로 등록이 되어야 한다.
+		CREATE LOGIN [myUser] With password = 'myPass4',
+		default_database    = [NorthWind],
+		DEFAULT_LANGUAGE    = us_english, 
+		CHECK_EXPIRATION    = OFF, 
+		CHECK_POLICY        = OFF
+    END
+ELSE
+    --Delete: Security>Logins>myUser
+	DROP LOGIN [myUser];
+
+====================================================================================================
+DELETE SERVER LOGIN USER
+====================================================================================================
+USE master 
+DROP LOGIN '계정명'
+DROP LOGIN [myUser]
+
+====================================================================================================
+ADD LOGIN USER TO SERVER: (NO SERVER ROLE, USER MAPPING)
+====================================================================================================
+
+CREATE LOGIN [myUser] with PASSWORD = 'myPass' MUST_CHANGE, CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF, DEFAULT_DATABASE = [NorthWind];
+	--> Enforce Password Security = OFF
+	--> Default Database = master
+    --> User Role = public
+    --> Database Mapping = None
+
+EXEC sp_addlogin '계정명','비번'
+EXEC sp_addlogin 'username','password'
+EXEC sp_addlogin 'myUser',  'myPass'  
+	--> Enforce Password Security = On
+	--> Default Database = master
+    --> User Role = public
+    --> Database Mapping = None
+----------------------------------------------------------------------------------------------------
+CREATE LOGIN login_name { WITH <option_list1> | FROM <sources> }  
+
+<option_list1> ::=   
+    PASSWORD = { 'password' | hashed_password HASHED } [ MUST_CHANGE ] [ , <option_list2> [ ,... ] ]  
+
+<option_list2> ::=    
+    SID = sid  
+    | DEFAULT_DATABASE = database      
+    | DEFAULT_LANGUAGE = language  
+    | CHECK_EXPIRATION = { ON | OFF}  
+    | CHECK_POLICY = { ON | OFF}  
+    | CREDENTIAL = credential_name   
+
+<sources> ::=  
+    WINDOWS [ WITH <windows_options>[ ,... ] ]  
+    | CERTIFICATE certname  
+    | ASYMMETRIC KEY asym_key_name  
+
+<windows_options> ::=        
+    DEFAULT_DATABASE = database  
+    | DEFAULT_LANGUAGE = language 
+----------------------------------------------------------------------------------------------------
+passwords must contain at least three of the following four characteristics:
+----------------------------------------------------------------------------------------------------
+An uppercase character (A-Z).
+A lowercase character (a-z).
+A digit (0-9).
+One of the non-alphanumeric characters, such as a space, _, @, *, ^, %, !, $, #, or &.
+
+----------------------------------------------------------------------------------------------------
+CREATE LOGIN [myUser] with PASSWORD = 'myPass', CREDENTIAL = <credential_name>
+----------------------------------------------------------------------------------------------------
+User Security > Create 'Credential'
+A credential is a record containing the authentication information needed to connect to a resource outside of SQL Server. 
+Most credentials consist of a Windows login name and password.
+
+====================================================================================================
+ADD SERVER LOGIN USER TO DATABASE
+----------------------------------------------------------------------------------------------------
+SERVER LOGIN USER로 Login을 하면 아무런 Database Table도 볼수가 없다
+그 이유는 어떠한 권한도 없기 때문에 할 수 있는것이 아무누것도 없다.
+따라서 필요한 사항만 GRANT를 해주게 되면 오직 해당 기능만을 할 수 있다.
+====================================================================================================
+USE NorthWind
+EXEC sp_grantdbaccess '계정명','로그인명'          <-- THIS IS IMPORTANT
+EXEC sp_addrolemember 'db_owner','계정명'
+EXEC sp_addrolemember  db_datareader, '계정명';
+EXEC sp_addrolemember  db_datawriter, '계정명';
+EXEC sp_addsrvrolemember '계정명','sysadmin' 
+---
+USE NorthWind
+EXEC sp_grantdbaccess 'username','username'         <-- THIS IS IMPORTANT
+EXEC sp_addrolemember 'db_owner','username'         --> Error without 'sp_grantdbaccess'
+EXEC sp_addrolemember 'db_owner','myUser'
+EXEC sp_addrolemember  db_datareader, 'username';   --> Error without 'sp_grantdbaccess'
+EXEC sp_addrolemember  db_datawriter, 'username';
+EXEC sp_addsrvrolemember 'username','sysadmin' 
+
+====================================================================================================
+GRANT EXECUTE TO DATABASE OR USER:  GRANT TABLE, SCHEMA, COLUMN
+====================================================================================================
+GRANT EXECUTE TO MYUSER;                                -> to execute all Stored Procedures for a Database
+GRANT EXECUTE ON dbo.sp_mystoredprocedure  TO MYUSER;   -> to execute specific stored procedures
+
+GRANT ALL                                           TO myUser
+GRANT UPDATE                                        TO myUser  <-- 모든 Table에 대하여 GRANT
+GRANT SELECT                    ON dbo              TO myUser  <-- 스키마(Default:dbo)
+GRANT SELECT, INSERT, UPDATE    ON dbo.YourTable    TO myUser
+GRANT SELECT, INSERT            ON dbo.YourTable2   TO myUser
+GRANT SELECT, DELETE            ON dbo.YourTable3   TO myUser
+
+====================================================================================================
+sp_who2
+SELECT session_id FROM sys.dm_exec_sessions WHERE login_name = 'sqluser'
+KILL 52
+DROP LOGIN sqluser

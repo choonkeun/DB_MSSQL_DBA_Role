@@ -1,0 +1,196 @@
+
+====================================================================================================
+SQLServer 사용자 관리
+====================================================================================================
+
+Database를 관리할때는 아래 3가지 관리 Language로 관리를 한다
+    DML – Data Manipulation Language: SELECT, INSERT, UPDATE, DELETE
+    DDL – Data Definition Language  : CREATE, ALTER, DROP
+    DCL – Data Control Language     : GRANT, REVOKE, DENY
+
+Database및 서버에 대한 관라를 위한 사용자를 서버관리역할 사용자와 Database관리 사용자로 나눈다.
+이것을 역할(Role)관리라고 하고 모든 사용자를 이 역할에 소속시켜서 관리를 한다.
+
+====================================================================================================
+1. Server Group (Login Property > Server Role 화면)
+
+    EXEC sp_addsrvrolemember  'Login Name', 'RoleName' 
+    EXEC sp_addsrvrolemember  'user1',      'sysadmin' 
+    ----------------------------------------------------------------------------------------------------------
+    역할              설명
+    ----------------------------------------------------------------------------------------------------------
+    bulkadmin       BULK INSERT 문을 실행할 수 있음
+    dbcreator       데이터베이스를 생성, 변경, 삭제 복원할 수 있음
+    diskadmin       디스크 파일을 관리할 수 있음
+  * processadmin    SQL Server의 인스턴스에서 실행되는 프로세스를 종료할 수 있음
+    public
+    securityadmin   로그인 및 해당 속성을 관리함. 서버 수준과 데이터베이스 수준의 사용권한을 부여(GRANT), 거부(DENY), 취소(REVOKE)할 수 있음
+    serveradmin     서버 차원의 구성 옵션을 변경하고 서버를 종료할 수 있음
+    setupadmin      연결된 서버를 추가하거나 제거하고 일부 시스템 저장프로시저를 실행할 수 있음
+  * sysadmin        서버에서 모든 작업을 수행할 수 있음
+    ----------------------------------------------------------------------------------------------------------
+  
+2. Database Group (Login Property > User Mapping 화면)
+
+    EXEC sp_addrolemember  'RoleName', 'Role Group Name' 
+    EXEC sp_addrolemember  'user1',    'db_datareader' 
+    EXEC sp_addrolemember  'user1',    'db_datawriter' 
+    EXEC sp_addrolemember  'user1',    'db_owner' 
+    ----------------------------------------------------------------------------------------------------------
+    역할                  설명 
+    ----------------------------------------------------------------------------------------------------------
+    db_accessadmin      Windows 로그인, Windows 그룹 및 SQL Server 로그인에 대한 액세스를 추가, 제거할 수 있음
+    db_backupoperator   데이터베이스를 백업할 수 있음
+  * db_datareader      사용자 테이블의 모든 데이터를 읽을 수 있음
+  * db_datawriter       사용자 테이블에서 데이터를 추가, 삭제, 변경할 수 있음
+    db_ddladmin         데이터베이스에서 모든 DDL(데이터 정의어) 명령을 실행할 수 있음
+    db_denydatareader   데이터베이스 내에 있는 사용자 테이블의 데이터를 읽을 수 없음
+    db_denydatawriter   데이터베이스 내의 사용자 테이블의 데이터를 추가, 수정, 삭제할 수 없음
+  * db_owner            데이터베이스에서 모든 구성 및 유지 관리 작업을 수행할 수 있음
+    db_secutiryadmin    멤버 자격을 수정하고 사용권한을 관리할 수 있음
+    public              모든 데이터베이스 사용자에게 디폴트로 부여되는 최소 권한을 갖는 역할
+    ----------------------------------------------------------------------------------------------------------
+ 
+3. Command List
+
+    Database에서 사용자 계정 확인           : EXEC sp_helpuser
+    SQL server에서 등록된 로그인 계정 확인  : EXEC sp_helplogins '계정명'
+
+    고정서버 역할                           : EXEC sp_addsrvrolemember 'user01' , 'sysadmin'
+    고정서버 역할 구성원 확인               : EXEC sp_helpsrvrolemember 'sysadmin'
+    고정 서버 역할 삭제                     : EXEC sp_dropsrvrolemember 'user01' , 'sysadmin'
+    고정서버 역할 확인                      : EXEC sp_helpsrvrole 
+    고정서버 역할 구성원 확인               : EXEC sp_helpsrvrolemember 'sysadmin'
+
+    현재 데이터베이스 역할 확인             : EXEC sp_helprole
+    현재 데이터베이스 역할 구성원 확인      : EXEC sp_helprolemember 'db_owner'
+    현재 데이터베이스에 액세스 권한 허용    : EXEC sp_grantdbaccess 'user01','user01'
+    현재 데이터베이스에 역할 구성원 추가    : EXEC sp_addrolemember 'db_owner','user01'
+    현재 데이터베이스에 역할 구성원 삭제    : EXEC sp_droprolemember 'db_owner','user01'
+    현재 데이터베이스에 액세스 권한 취소    : EXEC sp_revokedbaccess 'user01'
+    현재 데이터베이스의 역할 구성원 확인    : EXEC sp_helprolemember
+
+    SQL server의 데이터베이스 이름 확인     : EXEC sp_helpdb
+    현재 데이터 베이스의 데이블 확인        : EXEC sp_tables
+    SQL server의 버전정보 확인              : select @@version
+    현재 연결된 SQL Server 이름확인         : select @@servername
+====================================================================================================
+
+-------------------------------------
+1. Make Role Group 
+-------------------------------------
+    - DBA : sysadmin, 해당 데이터베이스에서 작업의 제약이 없음
+    - SQL Developer : db_owner이지만 SP, Function, Trigger를 제외한 다른 개체에대한 DDL문 사용권한 없음
+    - App Developer : data_reader & data_writer이고, 모든 SP에 대한 Execute와 View Definition 권한만 제공.
+
+-------------------------------------
+2. Set Group Role
+-------------------------------------
+    IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE [name]=N'APPDeveloper' AND [type]='R')
+        CREATE ROLE [APPDeveloper] AUTHORIZATION [dbo];
+     
+    IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE [name]=N'SQLDeveloper' AND [type]='R')
+        CREATE ROLE [SQLDeveloper] AUTHORIZATION [dbo];
+    GO
+     
+                          Role Name         Role Group Name
+    --------------------- ----------------- -----------------                           
+    EXEC sp_addrolemember N'db_datareader', N'APPDeveloper';
+    EXEC sp_addrolemember N'db_datawriter', N'APPDeveloper';
+    EXEC sp_addrolemember N'db_owner',      N'SQLDeveloper';
+    GO
+
+    SELECT * FROM sys.database_principals order by type
+    
+-------------------------------------
+3. Group에 권한 할당
+-------------------------------------
+    Use Database
+    GRANT VIEW DEFINITION   ON OBJECT::[SP이름]   TO [APPDeveloper];
+    GRANT EXECUTE           ON OBJECT::[SP이름]   TO [APPDeveloper];
+
+    GRANT EXECUTE  TO [APPDeveloper];
+    참고: 'ON OBJECT'를 빼면 전체에 권한이 할당이 된다
+
+-------------------------------------
+4. Server에는 EXECUTE권한만 할당 
+-------------------------------------
+	Web Server와 같이 Firewall외부에 있는 외부서버는 보안을 위하여 오직 Stored Procedure에 대한 실행권한만을 할당한다.
+    GRANT EXECUTE  ON OBJECT::[SP이름]  TO [ApplicationServer];
+
+-------------------------------------
+5. Dynamic Query를 위하여 
+-------------------------------------
+    SP를 실행할 때 사용할 User로 [SPExecutor]를 만들어 [db_owner] 권한을 가지도록 하고,
+    [AppServer], [Developer], [SQLDeveloper] Role이 [SPExecutor]를 가장할 수 있도록 GRANT문을 실행합니다.
+
+    IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE [name]=N'SPExecutor' AND [type]='S')
+        CREATE USER [SPExecutor] WITHOUT LOGIN WITH DEFAULT_SCHEMA=[dbo];
+    GO
+     
+    EXEC sp_addrolemember  'db_owner', N'SPExecutor';
+    EXEC sp_droprolemember 'db_owner', N'SPExecutor';
+    GO
+     
+    GRANT IMPERSONATE ON USER::SPExecutor TO AppServer;
+    GRANT IMPERSONATE ON USER::SPExecutor TO Developer;
+    GRANT IMPERSONATE ON USER::SPExecutor TO SQLDeveloper;
+    GO
+    
+-------------------------------------
+6. 다른 데이터베이스 간의 개체 참조
+-------------------------------------
+    ALTER DATABASE [DB이름] SET TRUSTWORTHY ON;
+
+
+
+-------------------------------------
+7. CREATE USER : Login ONLY : Database에 접근을 하려면 Database User로 등록이 되어야 한다.
+-------------------------------------
+
+    ** SERVER LEVEL User
+    CREATE LOGIN user1   With password='pass1', default_database = Calsyswo, DEFAULT_LANGUAGE=us_english, CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
+
+    ** DATABASE LEVEL User 
+	-- Database User등록: Calsysbo > Security > Users > Jelly
+	-- 서버Level User가 이미 등록이 되어 있어야 각각의 Database User로 등록이 된다.    
+    
+	USE calsysbo
+	CREATE USER user1 
+    
+    
+    ** Assign user to Role Group
+    exec sp_addrolemember  'SQLDeveloper',  'user1';
+    exec sp_droprolemember 'SQLDeveloper',  'user1'  
+    
+    ** GRANT TABLE, SCHEMA, COLUMN
+	GRANT  ALL                                  TO user1
+	GRANT  UPDATE                               TO user1  <-- 모든 Table에 대하여 GRANT
+	GRANT  SELECT ON dbo                        TO user1  <-- 스키마(Default:dbo)
+	GRANT  SELECT ON dbo.ADDRESS(CustomerName)  TO user1
+	REVOKE SELECT ON dbo.ADDRESS(CustomerName)  TO user1
+    
+    
+    ** delete database user
+    sp_droprolemember 'db_owner',  'user1'  
+    sp_dropuser user1
+    
+**********************************************
+
+USE AdventureWorks2012
+EXEC sp_addrolemember 'db_owner', 'Jelly'
+GO
+
+Change default database of a login:
+	alter login <loginname> with default_database = <dbname>;
+
+Create a user in a database for a given login:
+	use <dbname>;
+	create user <username> from login <loginname>;
+
+Make an user member of db_owner group:
+	use <dbname>
+	exec sp_addrolemember 'db_owner', '<username>';
+
+Make a login 'dbo' of a database:
+	alter authorization on database::<dbname> to <loginname>;

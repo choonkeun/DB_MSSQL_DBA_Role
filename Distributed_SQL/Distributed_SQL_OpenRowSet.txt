@@ -1,0 +1,39 @@
+
+https://docs.microsoft.com/en-us/sql/t-sql/functions/openrowset-transact-sql
+
+sp_configure 'show advanced options', 1;  
+RECONFIGURE;
+GO 
+sp_configure 'Ad Hoc Distributed Queries', 1;  
+RECONFIGURE;  
+GO  
+
+SELECT a.*  
+FROM OPENROWSET('SQLNCLI', 'Server=Seattle1;Trusted_Connection=yes;',  
+     'SELECT GroupName, Name, DepartmentID  
+      FROM AdventureWorks2012.HumanResources.Department  
+      ORDER BY GroupName, Name') AS a;  
+GO 
+---
+OPENROWSET   
+({ 'provider_name', 
+   { 'datasource' ; 'user_id' ; 'password' | 'provider_string' }, 
+   { [ catalog. ] [ schema. ] object | 'query' } | BULK 'data_file',   
+   { FORMATFILE = 'format_file_path' [ <bulk_options> ] | SINGLE_BLOB | SINGLE_CLOB | SINGLE_NCLOB }  
+})   
+
+<bulk_options> ::=  
+   [ , CODEPAGE = { 'ACP' | 'OEM' | 'RAW' | 'code_page' } ]   
+   [ , DATASOURCE = 'data_source_name' ]
+   [ , ERRORFILE = 'file_name' ]  
+   [ , ERRORFILE_DATASOURCE = 'data_source_name' ]   
+   [ , FIRSTROW = first_row ]   
+   [ , LASTROW = last_row ]   
+   [ , MAXERRORS = maximum_errors ]   
+   [ , ROWS_PER_BATCH = rows_per_batch ]  
+   [ , ORDER ( { column [ ASC | DESC ] } [ ,...n ] ) [ UNIQUE ] ]
+
+   -- bulk_options related to input file format
+   [ , FORMAT = 'CSV' ]
+   [ , FIELDQUOTE = 'quote_characters']
+   [ , FORMATFILE = 'format_file_path' ]    

@@ -1,0 +1,40 @@
+
+DTS를 이용하여 BACKUP하는 방법 : WORKING GOOD
+
+*******************************************************************
+Do not use this command to LIVE/PRODUCTION system
+*******************************************************************
+-- Turn off refer integ on a table (원래대로 제약조건 Flag를 OFF시킨다)
+ALTER TABLE [Employee] NOCHECK CONSTRAINT ALL
+ALTER TABLE [Employee] DISABLE TRIGGER ALL
+
+---------------------------------------------------------
+--DTS BACKUP : DTS를 이용하여 Table을 Backup/Transfer 한다.
+---------------------------------------------------------
+
+-- Turn refer integ back ON (원래대로 제약조건 Flag를 ON시킨다)
+ALTER TABLE [Employee]  CHECK CONSTRAINT ALL
+ALTER TABLE [Employee]  ENABLE TRIGGER ALL
+*******************************************************************
+
+
+
+
+
+*******************************************************************
+This turns off checking for all tables, giving you more wiggle room
+*******************************************************************
+
+-- Turn off refer integ
+EXEC sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'
+EXEC sp_MSForEachTable 'ALTER TABLE ? DISABLE TRIGGER ALL'
+
+---------------------------------------------------------
+--load data here
+---------------------------------------------------------
+
+-- Turn ON refer integ
+EXEC sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL'
+EXEC sp_MSForEachTable 'ALTER TABLE ? ENABLE TRIGGER ALL'
+*******************************************************************
+

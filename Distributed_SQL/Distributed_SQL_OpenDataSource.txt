@@ -1,0 +1,39 @@
+
+https://docs.microsoft.com/en-us/sql/t-sql/functions/opendatasource-transact-sql
+
+
+OPENDATASOURCE ( provider_name, init_string )  
+
+Keyword	OLE DB property	Valid values and description
+Data Source	        DBPROP_INIT_DATASOURCE	        Name of the data source to connect to. Different providers interpret this in different ways. For SQL Server Native Client OLE DB provider, this indicates the name of the server. For Jet OLE DB provider, this indicates the full path of the .mdb file or .xls file.
+Location	        DBPROP_INIT_LOCATION	        Location of the database to connect to.
+Extended Properties DBPROP_INIT_PROVIDERSTRING	    The provider-specific connect-string.
+Connect timeout	    DBPROP_INIT_TIMEOUT	            Time-out value after which the connection try fails.
+User ID	            DBPROP_AUTH_USERID	            User ID to be used for the connection.
+Password            DBPROP_AUTH_PASSWORD	        Password to be used for the connection.
+Catalog	            DBPROP_INIT_CATALOG	            The name of the initial or default catalog when connecting to the data source.
+Integrated Security	DBPROP_AUTH_INTEGRATED	        SSPI, to specify Windows A
+---
+SELECT *
+INTO NorthWind.dbo.UsrReports
+FROM OPENDATASOURCE(
+    'SQLNCLI', 
+    'Data Source=192.168.6.210;Initial Catalog=OEVS;Persist Security Info=True;User ID=myLogin;Password=myPassword')
+    .oevs.dbo.UsrReports 
+-->
+Msg 9514, Level 16, State 1, Line 6
+Xml data type is not supported in distributed queries. Remote object 'OPENDATASOURCE' has xml column(s).
+
+*****************************************
+OPENDATASOURCE CAN NOT SUPPORT XML COLUMN
+*****************************************
+
+---
+SELECT *  
+FROM OPENDATASOURCE('SQLNCLI',  
+    'Data Source=London\Payroll;Integrated Security=SSPI')  
+    .AdventureWorks2012.HumanResources.Employee  
+---
+SELECT * FROM OPENDATASOURCE('Microsoft.Jet.OLEDB.4.0',  
+'Data Source=C:\DataFolder\Documents\TestExcel.xls;Extended Properties=EXCEL 5.0')...[Sheet1$] ;  
+---
