@@ -1,0 +1,198 @@
+
+------------------------------------------------------------------------------
+sp_dboption is deprecated in the recent version of sql server 2012 and higher.
+------------------------------------------------------------------------------
+
+'auto create statistics'  Execute the following query in our SQL server 'auto create statistics'
+EXEC sp_dboption 'DatabaseName', 'auto create statistics', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'auto create statistics', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET AUTO_CREATE_STATISTICS OFF
+ALTER DATABASE BR SET AUTO_CREATE_STATISTICS ON
+
+----------------------------------------------------------------------------------------------------
+'auto update statistics' Execute the following query in our SQL server 'auto update statistics'
+EXEC sp_dboption 'DatabaseName', 'auto update statistics', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'auto update statistics', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET AUTO_UPDATE_STATISTICS ON
+ALTER DATABASE BR SET AUTO_UPDATE_STATISTICS OFF
+
+---------------------------------------------------------------------------------------------------
+'autoclose' Execute the following query in our SQL server 'autoclose'
+EXEC sp_dboption 'DatabaseName', 'autoclose', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'autoclose', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET AUTO_CLOSE ON
+ALTER DATABASE BR SET AUTO_CLOSE OFF
+
+----------------------------------------------------------------------------------------------------
+'autoshrink' Execute the following query in our SQL server 'autoshrink'
+EXEC sp_dboption 'DatabaseName', 'autoshrink', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'autoshrink', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET AUTO_SHRINK ON
+ALTER DATABASE BR SET AUTO_SHRINK OFF
+
+----------------------------------------------------------------------------------------------------
+'ANSI null default' Execute the following query in our SQL server 'ANSI null default'
+EXEC sp_dboption 'DatabaseName', 'ANSI null default', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'ANSI null default', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET ANSI_NULL_DEFAULT ON
+ALTER DATABASE BR SET ANSI_NULL_DEFAULT OFF
+
+----------------------------------------------------------------------------------------------------
+'ANSI nulls' Execute the following query in our SQL server 'ANSI nulls’
+EXEC sp_dboption 'DatabaseName', 'ANSI nulls', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'ANSI nulls', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET ANSI_NULLS ON
+ALTER DATABASE BR SET ANSI_NULLS OFF
+
+----------------------------------------------------------------------------------------------------
+'ANSI warnings' Execute the following query in our SQL server 'ANSI warnings’
+EXEC sp_dboption 'DatabaseName', 'ANSI warnings', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'ANSI warnings', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET ANSI_WARNINGS ON
+ALTER DATABASE BR SET ANSI_WARNINGS OFF
+
+----------------------------------------------------------------------------------------------------
+'arithabort' Execute the following query in our SQL server 'arithabort'
+EXEC sp_dboption 'DatabaseName', 'arithabort', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'arithabort', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET ARITHABORT ON
+ALTER DATABASE BR SET ARITHABORT OFF
+
+----------------------------------------------------------------------------------------------------
+'concat null yields null' Execute the following query in our SQL server 'concat null yields null'
+EXEC sp_dboption 'DatabaseName', 'concat null yields null', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'concat null yields null', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET CONCAT_NULL_YIELDS_NULL ON
+ALTER DATABASE BR SET CONCAT_NULL_YIELDS_NULL OFF
+
+----------------------------------------------------------------------------------------------------
+'cursor close on commit' Execute the following query in our SQL server 'cursor close on commit'
+EXEC sp_dboption 'DatabaseName', 'cursor close on commit', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'cursor close on commit', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET CURSOR_CLOSE_ON_COMMIT ON
+ALTER DATABASE BR SET CURSOR_CLOSE_ON_COMMIT OFF
+
+----------------------------------------------------------------------------------------------------
+'default to local cursor' Execute the following query in our SQL server 'default to local cursor'
+EXEC sp_dboption 'DatabaseName', 'default to local cursor', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'default to local cursor', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET CURSOR_DEFAULT LOCAL
+ALTER DATABASE BR SET CURSOR_DEFAULT GLOBAL
+
+----------------------------------------------------------------------------------------------------
+'numeric roundabort'  Execute the following query in our SQL server 'numeric roundabort'
+EXEC sp_dboption 'DatabaseName', 'numeric roundabort', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'numeric roundabort', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET NUMERIC_ROUNDABORT ON
+ALTER DATABASE BR SET NUMERIC_ROUNDABORT OFF
+
+----------------------------------------------------------------------------------------------------
+'quoted identifier' Execute the following query in our SQL server 'quoted identifier'
+EXEC sp_dboption 'DatabaseName', 'quoted identifier', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'quoted identifier', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET QUOTED_IDENTIFIER ON
+ALTER DATABASE BR SET QUOTED_IDENTIFIER OFF
+
+----------------------------------------------------------------------------------------------------
+'read only' Execute the following query in our SQL server ‘read only'
+EXEC sp_dboption 'DatabaseName', 'read only', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'read only', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET READ_ONLY
+ALTER DATABASE BR SET READ_WRITE
+
+----------------------------------------------------------------------------------------------------
+'offline' Execute the following query in our SQL server ‘offline’
+EXEC sp_dboption 'DatabaseName', 'offline', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'offline', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET OFFLINE
+ALTER DATABASE BR SET ONLINE
+
+----------------------------------------------------------------------------------------------------
+‘recursive triggers' Execute the following query in our SQL server ‘recursive triggers'
+EXEC sp_dboption 'DatabaseName', 'recursive triggers', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'recursive triggers', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET RECURSIVE_TRIGGERS ON
+ALTER DATABASE BR SET RECURSIVE_TRIGGERS OFF
+
+----------------------------------------------------------------------------------------------------
+'single user' Execute the following query in our SQL server 'single user'
+EXEC sp_dboption 'DatabaseName', 'single user', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'single user', ''FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET SINGLE_USER
+ALTER DATABASE BR SET MULTI_USER
+
+----------------------------------------------------------------------------------------------------
+'torn page detection' Execute the following query in our SQL server 'torn page detection'
+EXEC sp_dboption 'DatabaseName', 'torn page detection', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'torn page detection', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET TORN_PAGE_DETECTION ON
+ALTER DATABASE BR SET TORN_PAGE_DETECTION OFF
+
+----------------------------------------------------------------------------------------------------
+'select into/bulkcopy' Execute the following query in our SQL server 'select into/bulkcopy'
+EXEC sp_dboption 'DatabaseName', 'select into/bulkcopy', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'select into/bulkcopy', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET RECOVERY BULK_LOGGED
+ALTER DATABASE BR SET RECOVERY FULL
+ -- or
+ALTER DATABASE BR SET RECOVERY SIMPLE
+
+----------------------------------------------------------------------------------------------------
+'trunc. log on chkpt.' Execute the following query in our SQL server 'trunc. log on chkpt’.
+EXEC sp_dboption 'DatabaseName', 'trunc. log on chkpt.', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'trunc. log on chkpt.', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET RECOVERY SIMPLE
+ALTER DATABASE BR SET RECOVERY FULL
+ -- or
+ALTER DATABASE BR SET RECOVERY BULK_LOGGED
+
+----------------------------------------------------------------------------------------------------
+'dbo use only' Execute the following query in our SQL server 'dbo use only'
+EXEC sp_dboption 'DatabaseName', 'dbo use only', 'TRUE';
+EXEC sp_dboption 'DatabaseName', 'dbo use only', 'FALSE';
+
+Then Replacement of the following query in our SQL server
+ALTER DATABASE BR SET RESTRICTED_USER
+ALTER DATABASE BR SET MULTI_USER
+ -- or
+ALTER DATABASE BR SET SINGLE_USER
