@@ -1,0 +1,131 @@
+		public void Main()
+		{
+            string dateTime = DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
+
+            string sourceTableName = Dts.Variables["User::sourceTableName"].Value.ToString();
+            string targetFoler = Dts.Variables["User::TargetFolder"].Value.ToString();
+            if (!targetFoler.EndsWith(@"\")) targetFoler = targetFoler + @"\";
+            string targetFileName = targetFoler + dateTime + @"_" + sourceTableName + ".xlsx";
+            string SheetName = Dts.Variables["User::SheetName"].Value.ToString();
+            if (SheetName.Trim().Length == 0) SheetName = sourceTableName;
+
+            try
+            {
+                //clear target folder
+                var dir = new DirectoryInfo(targetFoler);
+                foreach (var f in dir.EnumerateFiles(dateTime.Substring(0, 10) + "*.xlsx"))
+                {
+                    f.Delete();
+                }
+
+                string columnName = "[";
+                DataSet ds = new DataSet();
+
+                SqlConnection sqlConn = new SqlConnection();
+                sqlConn.ConnectionString = "Data Source=EDIDEVSQL;Initial Catalog=COScheduler;Integrated Security=SSPI;";
+                sqlConn.Open();
+                if (sqlConn.State != ConnectionState.Open) sqlConn.Open();
+
+                string query = "select * from " + sourceTableName;
+                if (sqlConn.State == ConnectionState.Open)
+                {
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = sqlConn;
+                    cmd.CommandType = CommandType.Text;
+                    cmd.CommandText = query;
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(ds);
+
+                    //get field names
+                    foreach (DataTable t in ds.Tables)
+                    {
+                        //get ds.tables[0]
+                        foreach (DataColumn column in t.Columns)
+                        {
+                            columnName += column + "],[";
+                        }
+                    }
+                    columnName = columnName.Substring(0, columnName.Length - 2);
+                    columnName = columnName.Replace(",", " Text,");
+                    columnName = columnName + " Text";
+                    //MessageBox.Show(columnName);
+                }
+
+                //writes data to excel from adapter
+                //set OLE
+                OleDbConnection xlConn = new OleDbConnection();
+                OleDbCommand xlCmd = new OleDbCommand();
+
+                //set connection string
+                string connStr = "Provider=Microsoft.ACE.OLEDB.12.0;";
+                connStr += "Data Source=" + targetFileName + ";";
+                connStr += "Extended Properties=\"Excel 12.0 Xml;HDR=YES;\"";
+
+                xlConn.ConnectionString = connStr;
+                xlConn.Open();
+
+                xlCmd.Connection = xlConn;
+                xlCmd.CommandText = "Create table " + SheetName + " (" + columnName + ")";
+                xlCmd.ExecuteNonQuery();
+
+                foreach (DataTable t in ds.Tables)
+                {
+                    string cellInsert = string.Empty;
+                    string cellValue = "[";
+
+                    foreach (DataColumn c in t.Columns)
+                    {
+                        cellValue += c + "],[";
+                    }
+                    cellValue = cellValue.Remove(cellValue.Length - 2);
+                    cellInsert = "INSERT INTO " + SheetName + "(" + cellValue.TrimEnd(',') + ") VALUES(";
+
+                    int columnCount = t.Columns.Count;
+                    foreach (DataRow row in t.Rows)
+                    {
+                        string columnvalues = "";
+                        for (int i = 0; i < columnCount; i++)
+                        {
+                            int index = t.Rows.IndexOf(row);
+                            if (t.Rows[index].ItemArray[i].GetType() == typeof(String))
+                            {
+                                string myString = ((string)t.Rows[index].ItemArray[i]).Replace(@"'", @"''"); 
+                                //myString = RemoveInvalidXmlChars(myString);
+                                columnvalues += "'" + myString + "',";
+                            }
+                            else
+                                columnvalues += "'" + t.Rows[index].ItemArray[i] + "',";
+
+                        }
+                        columnvalues = columnvalues.TrimEnd(',');
+                        var command = cellInsert + columnvalues + ")";
+                        xlCmd.CommandText = command;
+                        xlCmd.ExecuteNonQuery();
+                    }
+                }
+
+                xlConn.Close();
+                Dts.TaskResult = (int)ScriptResults.Success;
+            }
+            catch (Exception ex)
+            {
+                using (StreamWriter sw = File.CreateText(Dts.Variables["User::FolderPath"].Value.ToString() + "\\" +
+                    Dts.Variables["User::sourceTableName"].Value.ToString() + dateTime + ".log"))
+                {
+                    sw.WriteLine(ex.ToString());
+                    Dts.TaskResult = (int)ScriptResults.Failure;
+                }
+            }
+
+		}
+
+        public static string RemoveInvalidXmlChars(string input)
+        {
+            var isValid = new Predicate<char>(value =>
+                (value >= 0x0020 && value <= 0xD7FF) ||
+                (value >= 0xE000 && value <= 0xFFFD) ||
+                value == 0x0009 ||
+                value == 0x000A ||
+                value == 0x000D);
+            return new string(Array.FindAll(input.ToCharArray(), isValid));
+        }
