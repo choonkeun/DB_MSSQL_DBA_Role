@@ -1,0 +1,30 @@
+
+
+USE [NorthWind]
+GO
+ALTER PROCEDURE [dbo].[GetLastCustomersId]
+    @LastId varchar(5) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT  top 1 @LastId = CustomerID
+    FROM    dbo.Customers
+    ORDER BY CustomerID DESC
+END
+
+---SQL TEST
+    declare @id varchar(5)
+    exec GetLastCustomersId @id output 
+    select @id
+
+---SSIS: Execute SQL Task
+    EXEC GetLastCustomersId @LastId=? OUT
+
+---SSIS: Parameter Mapping
+    Variable Name   : UserOd::Id
+    Direction       : Output
+    Data Type       : NVARCHAR
+    Parameter Name  : 0 (First Parameter), 1,2,3 ...
+    Parameter Size  : 5
+    
+
