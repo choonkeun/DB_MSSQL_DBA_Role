@@ -1,0 +1,80 @@
+
+<connectionStrings>
+  <add name="MyDbConn1" connectionString="Server=MyServer;Database=MyDb;Trusted_Connection=Yes;"/>
+  <add name="MyDbConn2" connectionString="Initial Catalog=MyDb;Data Source=MyServer;Integrated Security=SSPI;"/>
+</connectionStrings> 
+
+
+=======================
+OLEDB Connection String
+=======================
+
+<connectionStrings>
+  <add name="CustomerDataConnectionString" 
+    connectionString="Provider=Microsoft.Jet.OLEDB.4.0; 
+    Data Source=|DataDirectory|Northwind.mdb"
+    providerName="System.Data.OleDb" />
+</connectionStrings>
+
+
+** Excel 97-2003 Xls files with ACE OLEDB 12.0
+Provider=Microsoft.ACE.OLEDB.12.0;Data Source=c:\myFolder\myOldExcelFile.xls;Extended Properties="Excel 8.0;HDR=YES";
+"HDR=Yes;" indicates that the first row contains columnnames, not data. "HDR=No;" indicates the opposite.
+
+Provider=Microsoft.ACE.OLEDB.12.0;Data Source=c:\myFolder\myOldExcelFile.xls; Extended Properties="Excel 8.0;HDR=YES";
+
+** Excel 2010
+Provider=Microsoft.ACE.OLEDB.12.0;Data Source=c:\myFolder\myOldExcelFile.xlsx;Extended Properties="Excel 12.0 Xml;HDR=YES";
+
+===
+** Standard security (mdb file)
+Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\myFolder\myAccessFile.mdb;  Persist Security Info=False;
+Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\myFolder\myAccessFile.accdb;Persist Security Info=False;
+
+** With database password (mdb file)
+Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\myFolder\myAccessFile.mdb;  Jet OLEDB:Database Password=MyDbPassword;
+Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\myFolder\myAccessFile.accdb;Jet OLEDB:Database Password=MyDbPassword;
+
+** DataDirectory functionality (mdb file)
+Provider=Microsoft.ACE.OLEDB.12.0;Data Source=|DataDirectory|\myAccessFile.mdb;  Persist Security Info=False;
+Provider=Microsoft.ACE.OLEDB.12.0;Data Source=|DataDirectory|\myAccessFile.accdb;Persist Security Info=False;
+
+** Network Location (mdb file)
+Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\serverName\shareName\folder\myAccessFile.mdb;
+
+===
+DBF / FoxPro
+Provider=Microsoft.ACE.OLEDB.12.0;Data Source=c:\folder; Extended Properties=dBASE IV;User ID=Admin;
+===
+using System;
+using System.Windows.Forms;
+using System.Data.OleDb; 
+
+namespace WindowsApplication1
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string connetionString = null;
+            OleDbConnection cnn ;
+            connetionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=yourdatabasename.mdb;";
+            cnn = new OleDbConnection(connetionString);
+            try
+            {
+                cnn.Open();
+                MessageBox.Show ("Connection Open ! ");
+                cnn.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Can not open connection ! ");
+            }
+        }
+    }
+}
